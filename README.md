@@ -14,7 +14,7 @@ allprojects {
 #### Step 2. Add the dependency in you app module build.gradle dependencies
 ```
 dependencies {
-    implementation 'com.github.lvleo:ResultHelper:1.0.0'
+    implementation 'com.github.lvleo:ResultHelper:1.0.1'
 }
 ```
 
@@ -36,6 +36,7 @@ ResultHelper.with(MainActivity.this).requestPermissions(new String[]{Manifest.pe
 
 #### Step 3.2. Copy this code into you class where you need for onStartActivityForResult
 ```
+//不传递任何数据
 ResultHelper.with(this).startForResult(TestActivity.class, new OnActivityResultListener() {
     @Override
     public void onResult(int resultCode, Intent data) {
@@ -45,5 +46,21 @@ ResultHelper.with(this).startForResult(TestActivity.class, new OnActivityResultL
             Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
         }
     }
+});
+
+//数据用 Intent 包装传递
+Intent intent = new Intent();
+intent.putExtra("type", "1");
+ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, intent, (resultCode, data) -> {
+     String resultStr = data.getStringExtra("testData");
+     Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+});
+
+//数据用 Bundle 包装传递
+Bundle bundle = new Bundle();
+bundle.putString("type", "2");
+ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, bundle, (resultCode, data) -> {
+    String resultStr = data.getStringExtra("testData");
+    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
 });
 ```

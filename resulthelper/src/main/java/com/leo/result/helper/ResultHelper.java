@@ -1,6 +1,7 @@
 package com.leo.result.helper;
 
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -30,6 +31,19 @@ public class ResultHelper {
 
         public void startForResult(Class clz, OnActivityResultListener listener) {
             getFragment(activity).startActForResult(new Intent(activity, clz), listener);
+        }
+
+        public void startForResult(Class clz, Intent data, OnActivityResultListener listener) {
+            Intent intent = new Intent(activity, clz);
+            intent.putExtras(data);
+            getFragment(activity).startActForResult(intent, listener);
+        }
+
+
+        public void startForResult(Class clz, Bundle bundle, OnActivityResultListener listener) {
+            Intent intent = new Intent(activity, clz);
+            intent.putExtras(bundle);
+            getFragment(activity).startActForResult(intent, listener);
         }
 
         private ForResultFragment getFragment(FragmentActivity activity) {

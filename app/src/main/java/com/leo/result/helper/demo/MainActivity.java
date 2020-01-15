@@ -3,6 +3,7 @@ package com.leo.result.helper.demo;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.leo.result.helper.OnActivityResultListener;
 import com.leo.result.helper.ResultHelper;
 
 
@@ -86,6 +88,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+                //数据用 Intent 包装传递
+                Intent intent = new Intent();
+                intent.putExtra("type", "1");
+                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, intent, (resultCode, data) -> {
+                    String resultStr = data.getStringExtra("testData");
+                    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+                });
+
+                //数据用 Bundle 包装传递
+                Bundle bundle = new Bundle();
+                bundle.putString("type", "2");
+                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, bundle, (resultCode, data) -> {
+                    String resultStr = data.getStringExtra("testData");
+                    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+                });
             }
         });
 
