@@ -33,15 +33,28 @@ public class ResultHelper {
             getFragment(activity).startActForResult(new Intent(activity, clz), listener);
         }
 
+        public void startForResult(Intent intent, OnActivityResultListener listener) {
+            getFragment(activity).startActForResult(intent, listener);
+        }
+
         public void startForResult(Class clz, Intent data, OnActivityResultListener listener) {
             Intent intent = new Intent(activity, clz);
             intent.putExtras(data);
             getFragment(activity).startActForResult(intent, listener);
         }
 
+        public void startForResult(Intent intent, Intent data, OnActivityResultListener listener) {
+            intent.putExtras(data);
+            getFragment(activity).startActForResult(intent, listener);
+        }
 
         public void startForResult(Class clz, Bundle bundle, OnActivityResultListener listener) {
             Intent intent = new Intent(activity, clz);
+            intent.putExtras(bundle);
+            getFragment(activity).startActForResult(intent, listener);
+        }
+
+        public void startForResult(Intent intent, Bundle bundle, OnActivityResultListener listener) {
             intent.putExtras(bundle);
             getFragment(activity).startActForResult(intent, listener);
         }

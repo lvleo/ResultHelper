@@ -4,16 +4,27 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.leo.result.helper.OnActivityResultListener;
 import com.leo.result.helper.ResultHelper;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentActivity;
 
 
 /**
@@ -22,6 +33,8 @@ import com.leo.result.helper.ResultHelper;
  * @Desc : 功能演示页面
  */
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private Context context;
 
@@ -33,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnRequestPermission = findViewById(R.id.btn_click_permission);
         Button btnStartResult = findViewById(R.id.btn_click_test_start_result);
+        Button btnTaskePhoto = findViewById(R.id.btn_click_test_take_photo);
 
         btnRequestPermission.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,5 +120,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        String ROOT_FILE_PATH = getExternalFilesDir("").getAbsolutePath();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+        String fileName = sdf.format(new Date()) + ".jpg";
+
+        btnTaskePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takePhoto(MainActivity.this, new File(ROOT_FILE_PATH, fileName), (resultCode, data) -> {
+                    if (resultCode == RESULT_OK) {
+                        String filePath = new File(ROOT_FILE_PATH, fileName).getAbsolutePath();
+                        Toast.makeText(MainActivity.this, "Path: "+filePath, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
     }
+
+    public static void takePhoto(Activity activity, File photoFile, OnActivityResultListener listener) {
+        Log.i(TAG, "takePhoto: photoFile======" + photoFile.getAbsolutePath());
+        if (!photoFile.getParentFile().exists()) {
+            photoFile.getParentFile().mkdirs();
+        }
+        if (photoFile.exists()) {
+            photoFile.delete();
+        }
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        // 把文件地址转换成Uri格式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //此处的 authority配置， 注意要和 AndroidManifest.xml 中的保持一致
+            Uri uri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".fileProvider", photoFile);
+            //添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        } else {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        }
+
+        ResultHelper.with((FragmentActivity) activity).startForResult(intent, listener);
+
+    }
+
 }

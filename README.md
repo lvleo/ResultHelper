@@ -63,4 +63,15 @@ ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, bundle, 
     String resultStr = data.getStringExtra("testData");
     Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
 });
+
+//跳转系统 Intent（比如拍照）
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+intent.addCategory(Intent.CATEGORY_DEFAULT);
+//...其他相关参数 参见 app module 里 MainActivity 类中 takePhoto() 示例代码
+ResultHelper.with((FragmentActivity) activity).startForResult(intent, (resultCode, data) -> {
+    if (resultCode == RESULT_OK) {
+        Log.e(TAG, "onResult: data------" + data.toString());
+    }
+});
+
 ```

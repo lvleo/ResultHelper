@@ -6,12 +6,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.SparseArray;
 
+import java.util.ArrayList;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
-import java.util.ArrayList;
 
 /**
  * @Author : yongxu.lv
