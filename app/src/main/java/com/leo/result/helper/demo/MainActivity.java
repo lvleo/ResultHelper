@@ -9,9 +9,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentActivity;
 
 import com.leo.result.helper.OnActivityResultListener;
 import com.leo.result.helper.ResultHelper;
@@ -20,11 +24,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.fragment.app.FragmentActivity;
 
 
 /**
@@ -38,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context;
 
+    private String fileName = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,12 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnRequestPermission = findViewById(R.id.btn_click_permission);
         Button btnStartResult = findViewById(R.id.btn_click_test_start_result);
-        Button btnTaskePhoto = findViewById(R.id.btn_click_test_take_photo);
+        Button btnTakePhoto = findViewById(R.id.btn_click_test_take_photo);
 
-        btnRequestPermission.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //申请相机权限
+        btnRequestPermission.setOnClickListener(v -> {
+            //申请相机权限
 //                ResultHelper.with(MainActivity.this).requestPermissions(new String[]{Manifest.permission.CAMERA}, new OnPermissionResultListener() {
 //                    @Override
 //                    public void onResult(boolean isGrant) {
@@ -64,24 +63,21 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                });
 
-                //Java 8 lambda code
-                ResultHelper.with(MainActivity.this).requestPermissions(new String[]{Manifest.permission.CAMERA}, isGrant -> {
-                    if (isGrant) {
-                        //所申请的权限已经获取成功，可进行下一步操作
-                        Toast.makeText(context, "相机权限已经获取", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(context, "权限获取失败，请去应用权限管理界面手动开启", Toast.LENGTH_LONG).show();
-                    }
-                });
+            //Java 8 lambda code
+            ResultHelper.with(MainActivity.this).requestPermissions(new String[]{Manifest.permission.CAMERA}, isGrant -> {
+                if (isGrant) {
+                    //所申请的权限已经获取成功，可进行下一步操作
+                    Toast.makeText(context, "相机权限已经获取", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "权限获取失败，请去应用权限管理界面手动开启", Toast.LENGTH_LONG).show();
+                }
+            });
 
-            }
         });
 
-        btnStartResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnStartResult.setOnClickListener(view -> {
 
-                //跳转页面并回传数据
+            //跳转页面并回传数据
 //                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, new OnActivityResultListener() {
 //                    @Override
 //                    public void onResult(int resultCode, Intent data) {
@@ -93,48 +89,56 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                });
 
-                //Java 8 lambda code
-                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, (resultCode, data) -> {
-                    //处理测试页面回传的数据
-                    if (resultCode == Activity.RESULT_OK && data != null) {
-                        String resultStr = data.getStringExtra("testData");
-                        Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
-                    }
-                });
+//                //Java 8 lambda code
+//                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, (resultCode, data) -> {
+//                    //处理测试页面回传的数据
+//                    if (resultCode == Activity.RESULT_OK && data != null) {
+//                        String resultStr = data.getStringExtra("testData");
+//                        Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+//                    }
+//                });
+//
+//                //数据用 Intent 包装传递
+//                Intent intent = new Intent();
+//                intent.putExtra("type", "1");
+//                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, intent, (resultCode, data) -> {
+//                    String resultStr = data.getStringExtra("testData");
+//                    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+//                });
 
-                //数据用 Intent 包装传递
-                Intent intent = new Intent();
-                intent.putExtra("type", "1");
-                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, intent, (resultCode, data) -> {
-                    String resultStr = data.getStringExtra("testData");
-                    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
-                });
+            //数据用 Bundle 包装传递
+            Bundle bundle = new Bundle();
+            bundle.putString("type", "2");
+            ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, bundle, (resultCode, data) -> {
+                String resultStr = data.getStringExtra("testData");
+                Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
+            });
 
-                //数据用 Bundle 包装传递
-                Bundle bundle = new Bundle();
-                bundle.putString("type", "2");
-                ResultHelper.with(MainActivity.this).startForResult(TestActivity.class, bundle, (resultCode, data) -> {
-                    String resultStr = data.getStringExtra("testData");
-                    Toast.makeText(context, "返回的数据为：" + resultStr, Toast.LENGTH_LONG).show();
-                });
-            }
         });
 
 
         String ROOT_FILE_PATH = getExternalFilesDir("").getAbsolutePath();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
-        String fileName = sdf.format(new Date()) + ".jpg";
 
-        btnTaskePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePhoto(MainActivity.this, new File(ROOT_FILE_PATH, fileName), (resultCode, data) -> {
-                    if (resultCode == RESULT_OK) {
-                        String filePath = new File(ROOT_FILE_PATH, fileName).getAbsolutePath();
-                        Toast.makeText(MainActivity.this, "Path: "+filePath, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        btnTakePhoto.setOnClickListener(v -> {
+
+            ResultHelper.with(MainActivity.this).requestPermissions(new String[]{Manifest.permission.CAMERA}, isGrant -> {
+                if (isGrant) {
+                    //所申请的权限已经获取成功，可进行下一步操作
+                    fileName = sdf.format(new Date()) + ".jpg";
+                    takePhoto(MainActivity.this, new File(ROOT_FILE_PATH, fileName), (resultCode, data) -> {
+                        if (resultCode == RESULT_OK) {
+                            Log.e(TAG, "onClick: data===============" + data);
+                            String filePath = new File(ROOT_FILE_PATH, fileName).getAbsolutePath();
+                            Toast.makeText(MainActivity.this, "Path: " + filePath, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(context, "权限获取失败，请去应用权限管理界面手动开启", Toast.LENGTH_LONG).show();
+                }
+            });
+
         });
 
     }

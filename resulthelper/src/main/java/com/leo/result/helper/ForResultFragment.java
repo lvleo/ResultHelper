@@ -6,12 +6,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.SparseArray;
 
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
+import java.util.ArrayList;
 
 /**
  * @Author : yongxu.lv
@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment;
  */
 public class ForResultFragment extends Fragment {
 
-    private SparseArray<OnActivityResultListener> actResultListeners = new SparseArray<>();
+    private SparseArray<OnActivityResultListener>   actResultListeners  = new SparseArray<>();
     private SparseArray<OnPermissionResultListener> permissionListeners = new SparseArray<>();
 
     @Override
@@ -44,7 +44,9 @@ public class ForResultFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OnActivityResultListener listener = actResultListeners.get(requestCode);
-        listener.onResult(resultCode, data);
+        if (listener != null) {
+            listener.onResult(resultCode, data);
+        }
         actResultListeners.remove(requestCode);
     }
 
@@ -72,7 +74,9 @@ public class ForResultFragment extends Fragment {
      */
     public void checkPermissions(String[] permissions, OnPermissionResultListener listener) {
         if (isAllGranted(permissions)) {
-            listener.onResult(true);
+            if (listener != null) {
+                listener.onResult(true);
+            }
             return;
         }
         int requestCode = permissionListeners.size() + 1;
@@ -81,8 +85,7 @@ public class ForResultFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         OnPermissionResultListener listener = permissionListeners.get(requestCode);
         permissionListeners.remove(requestCode);

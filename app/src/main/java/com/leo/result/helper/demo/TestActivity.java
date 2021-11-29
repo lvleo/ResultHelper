@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
@@ -28,14 +27,11 @@ public class TestActivity extends AppCompatActivity {
         Log.e(TAG, "onCreate: type======" + type);
 
         Button btnSetResultData = findViewById(R.id.btn_set_result_data);
-        btnSetResultData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent data = new Intent();
-                data.putExtra("testData", "测试 startForResult 功能");
-                setResult(Activity.RESULT_OK, data);
-                finish();
-            }
+        btnSetResultData.setOnClickListener(v -> {
+            Intent data = new Intent();
+            data.putExtra("testData", "测试 startForResult 功能");
+            setResult(Activity.RESULT_OK, data);
+            finish();
         });
 
     }
