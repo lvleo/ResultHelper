@@ -2,19 +2,22 @@
 
 To request permissions and startActivityForResult by Fragment without UI
 
-#### Step 1. Add the JitPack repository in your root build.gradle
+#### Step 1. Add the JitPack repository in your root ‘build.gradle’ file ①, OR ignore this step，Copy the ***.aar file to you app module libs folder
 ```
 allprojects {
     repositories {
-    ...
-    maven { url 'https://jitpack.io' }
+        ...
+        maven { url 'https://jitpack.io' }// method ①
     }
 }
 ```
-#### Step 2. Add the dependency in you app module build.gradle dependencies
+#### Step 2. Add the dependency in you app module ‘build.gradle’ dependencies ①，Or modify this file like ②
 ```
 dependencies {
-    implementation 'com.github.lvleo:ResultHelper:1.0.1'
+    //method ②
+    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
+    //method ①
+    implementation 'com.github.lvleo:ResultHelper:1.0.2'
 }
 ```
 
